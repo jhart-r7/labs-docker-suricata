@@ -1,0 +1,74 @@
+diff --git a/src/detect-reference.c b/src/detect-reference.c
+index 6fe04a2..4aa0cf9 100644
+--- a/src/detect-reference.c
++++ b/src/detect-reference.c
+@@ -76,6 +76,9 @@ void DetectReferenceFree(DetectReference *ref)
+     if (ref->reference != NULL) {
+         SCFree(ref->reference);
+     }
++    if (ref->keyname != NULL) {
++        SCFree(ref->keyname);
++    }
+     SCFree(ref);
+ 
+     SCReturn;
+@@ -147,6 +150,12 @@ static DetectReference *DetectReferenceParse(char *rawstr, DetectEngineCtx *de_c
+         goto error;
+     }
+ 
++    ref->keyname = SCStrdup((char *)key);
++    if (ref->keyname == NULL) {
++        SCLogError(SC_ERR_MEM_ALLOC, "strdup failed: %s", strerror(errno));
++        goto error;
++    }
++
+     /* free the substrings */
+     SCReturnPtr(ref, "Reference");
+ 
+diff --git a/src/detect-reference.h b/src/detect-reference.h
+index 6c513fe..3045d97 100644
+--- a/src/detect-reference.h
++++ b/src/detect-reference.h
+@@ -32,6 +32,8 @@
+  * \brief Signature reference list.
+  */
+ typedef struct DetectReference_ {
++    /* pointer to keyname */
++    char *keyname;
+     /* pointer to key */
+     char *key;
+     /* reference data */
+diff --git a/src/output-json-alert.c b/src/output-json-alert.c
+index 7476fbd..9db1ddf 100644
+--- a/src/output-json-alert.c
++++ b/src/output-json-alert.c
+@@ -158,6 +158,21 @@ void AlertJsonHeader(const Packet *p, const PacketAlert *pa, json_t *js)
+         return;
+     }
+ 
++    //for(DetectReference* ref = pa->s->references; ref; ref = ref->next)
++    //{
++    //    printf("%s,%s\r\n", ref->keyname, ref->reference);
++    //}
++
++    json_t* references = json_array();
++    for(DetectReference* ref = pa->s->references; ref; ref = ref->next)
++    {
++        char refstring[512] = {0};
++        snprintf(refstring, sizeof(refstring), "%s,%s", pa->s->references->keyname, pa->s->references->reference);
++
++        json_array_append_new(references, json_string(refstring));
++    }
++
++
+     json_object_set_new(ajs, "action", json_string(action));
+     json_object_set_new(ajs, "gid", json_integer(pa->s->gid));
+     json_object_set_new(ajs, "signature_id", json_integer(pa->s->id));
+@@ -167,6 +182,7 @@ void AlertJsonHeader(const Packet *p, const PacketAlert *pa, json_t *js)
+     json_object_set_new(ajs, "category",
+             json_string((pa->s->class_msg) ? pa->s->class_msg : ""));
+     json_object_set_new(ajs, "severity", json_integer(pa->s->prio));
++    json_object_set_new(ajs, "references", references);
+ 
+     if (p->tenant_id > 0)
+         json_object_set_new(ajs, "tenant_id", json_integer(p->tenant_id));
