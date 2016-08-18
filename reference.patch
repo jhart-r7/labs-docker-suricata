@@ -39,7 +39,7 @@ index 6c513fe..3045d97 100644
      char *key;
      /* reference data */
 diff --git a/src/output-json-alert.c b/src/output-json-alert.c
-index 7476fbd..9db1ddf 100644
+index 7476fbd..e1d6871 100644
 --- a/src/output-json-alert.c
 +++ b/src/output-json-alert.c
 @@ -158,6 +158,21 @@ void AlertJsonHeader(const Packet *p, const PacketAlert *pa, json_t *js)
@@ -55,7 +55,7 @@ index 7476fbd..9db1ddf 100644
 +    for(DetectReference* ref = pa->s->references; ref; ref = ref->next)
 +    {
 +        char refstring[512] = {0};
-+        snprintf(refstring, sizeof(refstring), "%s,%s", pa->s->references->keyname, pa->s->references->reference);
++        snprintf(refstring, sizeof(refstring), "%s,%s", ref->keyname, ref->reference);
 +
 +        json_array_append_new(references, json_string(refstring));
 +    }
