@@ -5,7 +5,7 @@ A docker container containing a slightly patched suricata version for pcap analy
 
 ## Problem Statement
 
-This docker container contains a custom patched suricata version which includes the references in the eve.json file for easy access by following processing efforts
+This docker container contains a custom patched suricata version which includes references (CVEs) in the eve.json file for analysis. It also incorporates the latest version of the emerging threats feed when it is built.
 
 ## Example
 
