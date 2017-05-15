@@ -23,6 +23,7 @@ WORKDIR /usr/src/suricata
 ADD reference.patch .
 RUN patch -p1 < reference.patch
 RUN ./autogen.sh
+ARG CACHE_DATE=not_a_date
 RUN ./configure && make && make install && make install-full && make clean
 RUN ldconfig
 

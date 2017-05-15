@@ -1,7 +1,7 @@
 image_name = labs-suricata
 
 docker_build:
-	docker build -t ${image_name} .
+	docker build -t ${image_name} --build-arg CACHE_DATE=`date +%Y-%m-%d:%H:%M:%S` .
 	docker tag ${image_name}:latest 181646978271.dkr.ecr.us-east-1.amazonaws.com/${image_name}:latest
 
 docker_push:
