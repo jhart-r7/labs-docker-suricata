@@ -29,6 +29,3 @@ RUN ldconfig
 
 WORKDIR /pcap
 ENTRYPOINT ["/usr/local/bin/suricata"]
-
-# clean up
-RUN rm -rf /var/cache/apk/*
